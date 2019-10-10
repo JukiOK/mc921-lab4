@@ -11,7 +11,7 @@ public class MyParser {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         // create a parser that feeds off the tokens buffer
         FunctionsParser parser = new FunctionsParser(tokens);
-        ParseTree tree = parser.root(); // begin parsing at prog rule
+        ParseTree tree = parser.source(); // begin parsing at prog rule
         FuncVisitor vis = new FuncVisitor();
         vis.visit(tree);
     }

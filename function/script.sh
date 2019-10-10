@@ -11,7 +11,7 @@ echo "func f(x) 10 * 2 * 3;" | java org.antlr.v4.gui.TestRig Functions root -tok
 #feeding a string and reading tree in list style
 echo "func f(x) 10 * 2 * 3;" | java org.antlr.v4.gui.TestRig Functions root -tree
 #feeding a string and printing a graphical tree
-echo "func f(x) 10 * 2 * 3;" | java org.antlr.v4.gui.TestRig Functions root -gui
+# echo "func f(x) 10 * 2 * 3;" | java org.antlr.v4.gui.TestRig Functions root -gui
 #execute the implemented visitor
 echo "func f(x) 10 * 2 * 3;" | java MyParser
 

@@ -17,7 +17,8 @@ public class FuncVisitor extends FunctionsBaseVisitor<Integer> {
 	public Integer visitProgram(FunctionsParser.ProgramContext ctx) {
 		visit(ctx.root());
 		init += "}";
-		System.out.println("OKK\n");
+		System.out.println("code" + code);
+		System.out.println(init);
 		// File file = new File("code.ll"); // Specify the filename
 		return 0;
 	}
@@ -36,13 +37,11 @@ public class FuncVisitor extends FunctionsBaseVisitor<Integer> {
 		int valuereg = visit(ctx.expr());
 		// init += ctx.ID().getText() + "= " + String.valueOf(valuereg);
 		isCode = true;
-		System.out.println("code" + code);
-		System.out.println(init);
 		return 0;
   }
 
 	public Integer visitDecFunc(FunctionsParser.DecFuncContext ctx){
-		init += "define i32 @" + ctx.ID().getText() + "(i32";
+		code += "define i32 @" + ctx.ID().getText() + "(i32";
 		// if(!var.contains(ctx.ID().getText()) && funcs.get(ctx.ID().getText()) == null) {
 		// 	param.clear();
 		// 	int n = visit(ctx.ids()); //guardar funções no hash com quantidade de parametros
@@ -53,11 +52,8 @@ public class FuncVisitor extends FunctionsBaseVisitor<Integer> {
 		// 	System.out.println("Symbol already declared: " + ctx.ID().getText());
 		// }
 		// visit(ctx.ids());
-		isCode = false;
-		visit(ctx.expr());
 		isCode = true;
-		System.out.println("code" + code);
-		System.out.println(init);
+		visit(ctx.expr());
 		return 0;
 	}
 
