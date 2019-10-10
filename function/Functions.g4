@@ -1,6 +1,6 @@
-grammar Functions;  
+grammar Functions;
 
-source: root EOF;
+source: root EOF #program;
 
 root: root root
    | dec
