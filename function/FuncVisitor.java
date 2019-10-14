@@ -11,7 +11,7 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
     private ArrayList < String > param = new ArrayList < String > (); // guarda parametros da função, para verificar se as variáveis estão no escopo dela
     private int lastRegister = 0;
     private String code = "";
-    private String init = "deﬁne void @init()\n";
+    private String init = "deﬁne void @init(){\n";
     private ArrayList < Integer > args = new ArrayList < Integer > ();
     private boolean isCode = true;
 
@@ -28,7 +28,7 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
     @Override
     public Integer visitDecVar(FunctionsParser.DecVarContext ctx) {
         // if(!var.contains(ctx.ID().getText()) && funcs.get(ctx.ID().getText()) == null) {
-        // 	var.add(ctx.ID().getText());
+        var.add(ctx.ID().getText());
         // }else {
         // 	//ERRO já foi declarado
         // 	System.out.println("Symbol already declared: " + ctx.ID().getText());
@@ -38,7 +38,7 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
         code += "@" + ctx.ID().getText() + " = global i32 0\n";
         isCode = false;
         int valuereg = visit(ctx.expr());
-        init += "store i32 %" + valuereg + "i32* @" + ctx.ID().getText() + "\n";
+        init += "store i32 %" + valuereg + ", i32* @" + ctx.ID().getText() + "\n";
         isCode = true;
         return 0;
     }
@@ -47,7 +47,6 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
         code += "define i32 @" + ctx.ID().getText() + "(";
         param.clear();
         visit(ctx.ids());
-        System.out.println(param);
         for (int i = 0; i < param.size() - 1; i++) {
             code += "i32 %" + param.get(i) + ", ";
         }
@@ -64,7 +63,7 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
         // visit(ctx.ids());
         isCode = true;
         int resreg = visit(ctx.expr());
-        code += "	ret %" + resreg + "\n" + "}\n";
+        code += "ret %" + resreg + "\n" + "}\n";
         return 0;
     }
 
@@ -79,7 +78,7 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
 
     public Integer visitFunction(FunctionsParser.FunctionContext ctx) {
         int resreg = ++lastRegister;
-        String instr = "%" + resreg + " = call i32 @" + ctx.ID + "(i32 "%x)
+        String instr = "%" + resreg + " = call i32 @" + ctx.ID().getText() + "(i32 ";
         args.clear();
         visit(ctx.values());
         for(int i = 0; i < args.size(); i++){
@@ -103,7 +102,7 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
         int leftreg = visit(ctx.expr());
         int rightreg = visit(ctx.muldiv());
         int resreg = ++lastRegister;
-        String instr = "	%" + resreg + " = " + "add i32 " + leftreg + ", " + rightreg + "\n";
+        String instr = "%" + resreg + " = " + "add i32 %" + leftreg + ", %" + rightreg + "\n";
         if (isCode) {
             code += instr;
         } else {
@@ -116,7 +115,7 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
         int leftreg = visit(ctx.expr());
         int rightreg = visit(ctx.muldiv());
         int resreg = ++lastRegister;
-        String instr = "	%" + resreg + " = " + "sub i32 " + leftreg + ", " + rightreg + "\n";
+        String instr = "%" + resreg + " = " + "sub i32 %" + leftreg + ", %" + rightreg + "\n";
         if (isCode) {
             code += instr;
         } else {
@@ -133,7 +132,7 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
         int leftreg = visit(ctx.muldiv());
         int rightreg = visit(ctx.paren());
         int resreg = ++lastRegister;
-        String instr = "	%" + resreg + " = " + "mul i32 %" + leftreg + ", %" + rightreg + "\n";
+        String instr = "%" + resreg + " = " + "mul i32 %" + leftreg + ", %" + rightreg + "\n";
         if (isCode) {
             code += instr;
         } else {
@@ -146,7 +145,7 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
         int leftreg = visit(ctx.muldiv());
         int rightreg = visit(ctx.paren());
         int resreg = ++lastRegister;
-        String instr = "	%" + resreg + " = " + "div i32 %" + leftreg + ", %" + rightreg + "\n";
+        String instr = "%" + resreg + " = " + "div i32 %" + leftreg + ", %" + rightreg + "\n";
         if (isCode) {
             code += instr;
         } else {
@@ -162,10 +161,10 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
     public Integer visitParenID(FunctionsParser.ParenIDContext ctx) {
         int resreg = ++lastRegister;
         String instr = "%" + resreg + " = ";
+        String id = ctx.ID().getText();
         if (param.contains(id)) {
             instr += "add i32 %" + id + ", 0\n";
-        }
-        if (var.contains(id)) {
+        }else if (var.contains(id)) {
             instr += "load i32, i32* @" + id + "\n";
         }
         if (isCode) {
@@ -192,6 +191,10 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
         return resreg;
     }
 
+    public Integer visitParenParen(FunctionsParser.ParenParenContext ctx){
+      return visit(ctx.expr());
+    }
+
     public Integer visitArgvNum(FunctionsParser.ArgvNumContext ctx) {
         int resreg = ++lastRegister;
         String instr = "%" + resreg + " = " + "add i32 " + ctx.NUM().getText() + ", 0\n";
@@ -210,8 +213,7 @@ public class FuncVisitor extends FunctionsBaseVisitor < Integer > {
         String instr = "%" + resreg + " = ";
         if (param.contains(id)) {
             instr += "add i32 %" + id + ", 0\n";
-        }
-        if (var.contains(id)) {
+        }else if (var.contains(id)) {
             instr += "load i32, i32* @" + id + "\n";
         }
         if (isCode) {
