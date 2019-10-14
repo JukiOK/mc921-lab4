@@ -6,15 +6,12 @@ java -jar "antlr-4.7.2-complete.jar" -no-listener -visitor Functions.g4
 export CLASSPATH=".:antlr-4.7.2-complete.jar:$CLASSPATH"
 #compiling the .java generated from Functions.g4 with MyParser.java and AddVisitor.java
 javac *.java
-#feeding a string and reading the tokens
-cat "../lab4/tests/test6.sm" | java org.antlr.v4.gui.TestRig Functions root -tokens
-#feeding a string and reading tree in list style
-cat "../lab4/tests/test6.sm" | java org.antlr.v4.gui.TestRig Functions root -tree
-#feeding a string and printing a graphical tree
-cat "../lab4/tests/test6.sm" | java org.antlr.v4.gui.TestRig Functions root -gui
 #execute the implemented visitor
-cat "../lab4/tests/test6.sm" | java MyParser
+cat "$1" | java MyParser
 
+llc code.ll
+gcc printer.c -o printer code.s
+./printer
 #feeding a string and reading the tokens
 # for i in 1 2 3 4 5 6 8; do
 #   cat "test${i}.sm" | java org.antlr.v4.gui.TestRig Functions root -tokens

@@ -1,7 +1,7 @@
-*.class
-*.interp
-*.tokens
-*.java
+*
+!*.c
+!script.sh
+!antlr-4.7.2-complete.jar
 !FuncVisitor.java
 !MyParser.java
 lab4/
